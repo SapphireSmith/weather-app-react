@@ -1,11 +1,11 @@
 import { DateTime } from 'luxon'
-const API_KEY = 'dd3221923501553907586696f510e6ca';
+// const API_KEY = 'dd3221923501553907586696f510e6ca';
+const API_KEY = '1fa9ff4126d95b8db54f3897a208e91c';
 const BASE_URL = 'https://api.openweathermap.org/data/2.5';
 
 const getWeatherData = (infoType, searchParams) => {
     const url = new URL(BASE_URL + '/' + infoType);
     url.search = new URLSearchParams({ ...searchParams, appid: API_KEY })
-    console.log(url);
     return fetch(url).then((res) => res.json())
 };
 
@@ -50,32 +50,49 @@ const formatForcastWeather = (data) => {
     hourly = hourly.slice(1, 6).map((d) => {
         return {
             title: formatToLocalTime(d.dt, timezone, "hh:mm a"),
-            temp: d.temp.day,
+            temp: d.temp,
             icon: d.weather[0].icon
         }
     })
+
+    return {timezone,daily, hourly}
 }
 
 //End for formating forcast weather
+
+
+// Function for calling the above three functions for getting structured data of weather
 
 const getFormattedWeatherData = async (searchParams) => {
     const formattedCurrentWeather = await getWeatherData
         ('weather', searchParams).then(formatCurrentWeather)
 
     const { lat, lon } = formattedCurrentWeather
-    console.log(formattedCurrentWeather);
+    
+    const formattedForcastWeather = await getWeatherData('onecall', {
+        lat,
+        lon,
+        exclude: "current,minutely,alerts",
+        units: searchParams.units,
+    }).then(formatForcastWeather)
 
-    // const formattedForcastWeather = await getWeatherData('onecall', {
-    //     lat,
-    //     lon,
-    //     exclude: "current,minutely,alerts",
-    //     units: searchParams.units,
-    // }).then(formatForcastWeather)
-    return { formattedCurrentWeather }
+    return { ...formattedCurrentWeather, ...formattedForcastWeather}
 }
 
-const formatToLocalTime = (secs, zone, format = "cccc, dd lll yyyy' | Local time: 'hh:mm a") => DateTime.fromSeconds(secs).
+//end of major function
+
+
+//function for converting the time stamp
+
+const formatToLocalTime = (secs, zone, format = "cccc, dd LLL yyyy' | Local time: 'hh:mm a") => DateTime.fromSeconds(secs).
     setZone(zone).toFormat(format);
+
+//end of function
+
+
+const iconUrlFromCode = (iconCode) => `http://openweathermap.org/img/wn/${iconCode}@2x.png`
 
 
 export default getFormattedWeatherData;
+
+export { iconUrlFromCode, formatToLocalTime }
