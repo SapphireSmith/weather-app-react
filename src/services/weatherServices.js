@@ -1,7 +1,7 @@
 import { DateTime } from 'luxon'
-// const API_KEY = 'dd3221923501553907586696f510e6ca';
-const API_KEY = '1fa9ff4126d95b8db54f3897a208e91c';
-const BASE_URL = 'https://api.openweathermap.org/data/2.5';
+
+const API_KEY = import.meta.env.VITE_OPENWEATHERMAP_API;
+const BASE_URL = import.meta.env.VITE_OPENWEATHERMAP_BASE_URL;
 
 const getWeatherData = (infoType, searchParams) => {
     const url = new URL(BASE_URL + '/' + infoType);
@@ -55,7 +55,7 @@ const formatForcastWeather = (data) => {
         }
     })
 
-    return {timezone,daily, hourly}
+    return { timezone, daily, hourly }
 }
 
 //End for formating forcast weather
@@ -68,7 +68,7 @@ const getFormattedWeatherData = async (searchParams) => {
         ('weather', searchParams).then(formatCurrentWeather)
 
     const { lat, lon } = formattedCurrentWeather
-    
+
     const formattedForcastWeather = await getWeatherData('onecall', {
         lat,
         lon,
@@ -76,7 +76,7 @@ const getFormattedWeatherData = async (searchParams) => {
         units: searchParams.units,
     }).then(formatForcastWeather)
 
-    return { ...formattedCurrentWeather, ...formattedForcastWeather}
+    return { ...formattedCurrentWeather, ...formattedForcastWeather }
 }
 
 //end of major function
