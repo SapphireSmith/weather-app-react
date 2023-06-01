@@ -1,6 +1,9 @@
 import React, { useState } from 'react'
 import Search from '../assets/search.svg'
 import { UilSearch, UilLocationPinAlt } from '@iconscout/react-unicons'
+import { toast } from 'react-toastify';
+
+
 const Inputs = ({ setQuery, setUnits, unit }) => {
 
   const [city, setCity] = useState('');
@@ -10,8 +13,10 @@ const Inputs = ({ setQuery, setUnits, unit }) => {
   }
 
   const handleLocationClick = () => {
+    toast.info('Featching location.')
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition((position) => {
+        toast.success('Location fetched.')
         let lat = position.coords.latitude;
         let lon = position.coords.longitude;
 

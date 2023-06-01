@@ -5,6 +5,8 @@ import TimeAndLocation from './components/TimeAndLocation'
 import TemperatureAndDetails from './components/TemparatureAndDetails'
 import Forecast from './components/Forcast'
 import getFormattedWeatherData from './services/weatherServices'
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const App = () => {
 
@@ -15,7 +17,10 @@ const App = () => {
 
   useEffect(() => {
     const fetchWeather = async () => {
+      const message = query.q ? query.q+'.':"current location."
+      toast.info('featching weather for '+message )
       await getFormattedWeatherData({ ...query, units }).then((data) => {
+        toast.success(`Successfully fetched weather for ${data.name}, ${data.country}`)
         setWeather(data);
       })
     }
@@ -25,7 +30,7 @@ const App = () => {
   const formatBackground = () => {
     if (!weather) return "from-cyan-700 to-blue-700"
 
-    const threshold = units === "metric" ? 40: 50;
+    const threshold = units === "metric" ? 40 : 50;
 
     console.log(weather.temp);
     console.log(weather.temp <= threshold);
@@ -56,6 +61,7 @@ const App = () => {
         </div>
       )}
 
+      <ToastContainer autoClose={5000} theme='colored' newestOnTop={true}/>
 
     </div >
   )
